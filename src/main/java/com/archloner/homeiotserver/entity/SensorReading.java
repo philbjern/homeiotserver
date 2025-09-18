@@ -18,10 +18,10 @@ public class SensorReading {
 
     private String deviceId;
 
-    private float temperature;
+    private Double temperature;
 
-    private float humidity;
+    private Double humidity;
 
-    private float light;
+    private Double light;
 
 }
