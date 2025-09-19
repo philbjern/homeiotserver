@@ -40,10 +40,10 @@ public class GrafanaController {
 
         List<SensorReading> readings = sensorService.getReadingsForDeviceId(deviceId).stream()
                 .filter(r -> {
-                    Instant ts = r.getTimestamp().atZone(ZoneId.systemDefault()).toInstant();
+                    Instant ts = r.getTimestampUtc().atZone(ZoneId.systemDefault()).toInstant();
                     return !ts.isBefore(fromInstant) && !ts.isAfter(toInstant);
                 })
-                .sorted(Comparator.comparing(SensorReading::getTimestamp))
+                .sorted(Comparator.comparing(SensorReading::getTimestampUtc))
                 .collect(Collectors.toList());
 
         // Optional: downsample if too many points
@@ -68,7 +68,7 @@ public class GrafanaController {
         Map<String, Object> series = new HashMap<>();
         series.put("target", name);
         series.put("datapoints", readings.stream()
-                .map(r -> Arrays.asList(valueMapper.apply(r), r.getTimestamp().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
+                .map(r -> Arrays.asList(valueMapper.apply(r), r.getTimestampUtc().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
                 .collect(Collectors.toList()));
         return series;
     }

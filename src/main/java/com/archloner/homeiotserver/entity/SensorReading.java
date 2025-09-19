@@ -3,7 +3,7 @@ package com.archloner.homeiotserver.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -14,14 +14,25 @@ public class SensorReading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime timestamp = LocalDateTime.now();
-
     private String deviceId;
+
+    @Column(name = "timestamp_utc", nullable = false)
+    private Instant timestampUtc;
+
+    @Column(name = "epoch_ms", nullable = false)
+    private Long epochMs;
 
     private Double temperature;
 
     private Double humidity;
 
     private Double light;
+
+    @PrePersist
+    public void prePersist() {
+        Instant now = Instant.now();
+        this.timestampUtc = now;
+        this.epochMs = now.toEpochMilli();
+    }
 
 }
