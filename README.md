@@ -100,11 +100,13 @@ ORDER BY timestamp_utc
 
 Send sensor data from ESP8266:
 
-```json
+```
 POST /api/sensors
 Content-Type: application/json
 Authorization: ApiKey your-api-key
+```
 
+```json
 {
   "deviceId": "esp8266-e07757",
   "temperature": 21.5,
