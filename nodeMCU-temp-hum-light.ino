@@ -4,15 +4,19 @@
 #include <ArduinoJson.h>
 
 #define LED_PIN 5
+#define INTERNAL_LED_PIN 2
+
+#define REQUEST_RATE_MINUTES 5
+
 #define DHTPIN 4
 #define DHTTYPE DHT11
 
 DHT dht(DHTPIN, DHTTYPE);
 
 // Wi-Fi credentials
-const char* ssid = "WIFI_SSID";
-const char* password = "WIFI_PASSWORD";
-const char* serverName = "SERVER_URL";
+const char* ssid = "{WIFI_SSID}";
+const char* password = "{WIFI_PASSWORD}";
+const char* serverName = "{API_URL}";
 
 String deviceId;
 
@@ -28,20 +32,21 @@ void blinkLED(int times, int duration) {
 void blinkFast(int times) {
   for (int i = 0; i < times; i++) {
     digitalWrite(LED_PIN, HIGH);
-    delay(100);
+    delay(50);
     digitalWrite(LED_PIN, LOW);
-    delay(100);
+    delay(50);
   }
 }
 
 void setup() {
   Serial.begin(115200);
+
   pinMode(LED_PIN, OUTPUT);
+  pinMode(INTERNAL_LED_PIN, OUTPUT);
+  digitalWrite(INTERNAL_LED_PIN, LOW);
 
   deviceId = "esp8266-" + String(ESP.getChipId(), HEX);
   Serial.println("Device ID: " + deviceId);
-
-  dht.begin();
 
   Serial.print("Connecting to WiFi");
   WiFi.begin(ssid, password);
@@ -50,6 +55,9 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("Connected!");
+
+  dht.begin();
+  delay(500);
 }
 
 void loop() {
@@ -75,6 +83,8 @@ void loop() {
 
     http.begin(client, serverName);
     http.addHeader("Content-Type", "application/json");
+    http.addHeader("Authorization", "Bearer {API_KEY}");
+    http.writeToStream(&Serial);
 
     // Build JSON
     StaticJsonDocument<256> doc;
@@ -90,15 +100,18 @@ void loop() {
     int httpResponseCode = http.POST(requestBody);
 
     if (httpResponseCode > 0) {
-      Serial.print("Response: ");
-      Serial.println(httpResponseCode);
+      Serial.print("Response code: ");
+      Serial.print(httpResponseCode);
+      String payload = http.getString();
+      Serial.print(", Response body: ");
+      Serial.println(payload);
     } else {
-      Serial.print("Error: ");
+      Serial.print("Error code: ");
       Serial.println(httpResponseCode);
     }
 
     http.end();
   }
 
-  delay(60000); // every 60s
+  delay(60000 * REQUEST_RATE_MINUTES); // every X minutes
 }
