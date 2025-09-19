@@ -103,7 +103,7 @@ Send sensor data from ESP8266:
 ```
 POST /api/sensors
 Content-Type: application/json
-Authorization: ApiKey your-api-key
+Authorization: Bearer your-api-key
 ```
 
 ```json
