@@ -5,25 +5,17 @@ A self-hosted Spring Boot application for collecting and visualizing sensor data
 ## ✨ Features:
 
 * REST API for storing sensor readings (temperature, humidity, light, etc.).
-
 * PostgreSQL backend with support for raw data and time-bucketed aggregation.
-
 * Grafana integration for dashboards and visualization.
-
 * Configurable alerts via Discord webhooks (thresholds stored in DB).
-
 * API key authentication for devices.
-
 * Systemd service support for easy deployment on Linux servers.
 
 ## 🛠️ Requirements
 
 * Java 21+
-
 * Maven 3.8+
-
 * PostgreSQL 14+
-
 * Grafana (optional, for dashboards)
 
 ![assets/grafana.png](assets/grafana.png)
@@ -32,7 +24,7 @@ A self-hosted Spring Boot application for collecting and visualizing sensor data
 
 ###  1. Clone & Build
 
-```
+```bash
 git clone https://github.com/yourusername/homeiotserver.git
 cd homeiotserver
 mvn clean package -DskipTests
@@ -42,7 +34,7 @@ mvn clean package -DskipTests
 
 Create database and user in PostgreSQL:
 
-```
+```SQL
 CREATE DATABASE homeiot;
 CREATE USER homeiotuser WITH ENCRYPTED PASSWORD 'yourpassword';
 GRANT ALL PRIVILEGES ON DATABASE homeiot TO homeiotuser;
@@ -50,7 +42,7 @@ GRANT ALL PRIVILEGES ON DATABASE homeiot TO homeiotuser;
 
 Schema example (simplified):
 
-```
+```SQL
 CREATE TABLE readings (
     id SERIAL PRIMARY KEY,
     device_id TEXT NOT NULL,
@@ -66,23 +58,23 @@ CREATE TABLE readings (
 
 Set database credentials in application.yml or environment variables:
 
-```
+```yaml
 spring:
-datasource:
-url: jdbc:postgresql://localhost:5432/homeiot
-username: homeiotuser
-password: yourpassword
+  datasource:
+    url: jdbc:postgresql://localhost:5432/homeiot
+    username: homeiotuser
+    password: yourpassword
 ```
 
 ### 4. Run
 
-```
+```bash
 java -jar target/homeiotserver-0.0.1-SNAPSHOT.jar
 ```
 
 Or as a systemd service (recommended):
 
-```
+```bash
 sudo cp homeiotserver.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable homeiotserver
@@ -93,7 +85,7 @@ sudo systemctl start homeiotserver
 
 Use PostgreSQL as a Grafana datasource and run queries like:
 
-```
+```SQL
 SELECT
   extract(epoch from timestamp_utc) * 1000 AS time,
   temperature,
@@ -108,7 +100,7 @@ ORDER BY timestamp_utc
 
 Send sensor data from ESP8266:
 
-```
+```json
 POST /api/sensors
 Content-Type: application/json
 Authorization: ApiKey your-api-key
