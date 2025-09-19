@@ -55,7 +55,7 @@ public class ReportService {
                 .average()
                 .orElse(Double.NaN);
 
-         String message = String.format("Average sensor values for last %d hours:\nTemperature: %.2f°C\nHumidity: %.2f%%\nLight: %.2f%%",
+         String message = String.format("Average sensor values for last %d hour:\nTemperature: %.2f°C\nHumidity: %.2f%%\nLight: %.2f%%",
                  hours, avgTemp, avgHumidity, avgLight * 100.0);
 
         ReportAlert report = new ReportAlert();
