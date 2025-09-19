@@ -26,6 +26,8 @@ A self-hosted Spring Boot application for collecting and visualizing sensor data
 
 * Grafana (optional, for dashboards)
 
+![assets/grafana.png](assets/grafana.png)
+
 ## 🚀 Setup
 
 ###  1. Clone & Build
