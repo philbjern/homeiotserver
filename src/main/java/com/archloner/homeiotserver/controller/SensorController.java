@@ -5,6 +5,7 @@ import com.archloner.homeiotserver.service.DiscordAlertService;
 import com.archloner.homeiotserver.service.SensorService;
 import com.archloner.homeiotserver.service.ThresholdService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,8 @@ public class SensorController {
 
     private final DiscordAlertService discordAlertService;
 
-    private final boolean discordAlertsEnabled = false;
+    @Value("${discord.alerts.threshold.enabled}")
+    private boolean discordAlertsEnabled;
 
     @PostMapping("/sensor")
     public ResponseEntity<SensorReading> saveReading(@RequestBody SensorReading request) {
