@@ -24,6 +24,9 @@ public class ReportService {
     @Value("${app.devices.main.id}")
     private String deviceId;
 
+    @Value("${discord.alerts.summary.enabled}")
+    private final boolean HOURLY_DISCORD_REPORT_ENABLED;
+
     @Transactional
     public void generateAverageReport(Long hours) {
         Instant now = Instant.now();
@@ -64,7 +67,9 @@ public class ReportService {
         report.setEndTime(now);
         report.setMessage(message);
 
-        discordAlertService.sendAlert(message);
+        if (HOURLY_DISCORD_REPORT_ENABLED) {
+            discordAlertService.sendAlert(message);
+        }
 
         report.setSent(true);
         reportRepository.save(report);
