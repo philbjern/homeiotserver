@@ -2,6 +2,7 @@ package com.archloner.homeiotserver;
 
 import com.archloner.homeiotserver.repository.SensorRepository;
 import com.archloner.homeiotserver.service.ReportService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,9 +26,21 @@ public class ScheduledTasks {
         this.sensorRepository = sensorRepository;
     }
 
-    @Scheduled(cron = "0 0 * * * *")
-    public void hourlyAverageDiscordReport() {
-        reportService.generateAverageReport(1L);
+//    @Scheduled(cron = "0 0 * * * *")
+//    public void hourlyAverageDiscordReport() {
+//        reportService.generateAverageReport(1L);
+//    }
+
+    // Run in the evening at 18:00
+    @Scheduled(cron = "0 0 18 * * *")
+    public void dailyAverageDiscordReport() {
+        reportService.generateDailyReport(ReportService.ReportType.DAY);
+    }
+
+    // Run in the morning at 6:00
+    @Scheduled(cron = "0 0 6 * * *")
+    public void nightlyAverageDiscordReport() {
+        reportService.generateDailyReport(ReportService.ReportType.NIGHT);
     }
 
     // Run every day at 3 AM
