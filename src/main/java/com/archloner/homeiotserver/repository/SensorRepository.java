@@ -15,7 +15,7 @@ public interface SensorRepository extends JpaRepository<SensorReading, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM readings WHERE timestamp_utc < :cutoff")
+    @Query(value = "DELETE FROM SensorReading r WHERE r.timestampUtc < :cutoff")
     int deleteOlderThan(Instant cutoff);
 
 }
