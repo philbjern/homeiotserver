@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class DiscordAlertService {
+public class DiscordService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${discord.webhook.url}")
     private String discordWebhookUrl;
 
-    public void sendAlert(String message) {
+    public void sendMessage(String message) {
         Map<String, String> payload = new HashMap<>();
         payload.put("content", "🚨 " + message);
         restTemplate.postForEntity(discordWebhookUrl, payload, String.class);

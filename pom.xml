@@ -68,7 +68,12 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

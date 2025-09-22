@@ -1,62 +1,42 @@
 package com.archloner.homeiotserver.controller;
 
+import com.archloner.homeiotserver.dto.SensorReadingRequest;
 import com.archloner.homeiotserver.entity.SensorReading;
-import com.archloner.homeiotserver.service.DiscordAlertService;
+import com.archloner.homeiotserver.service.AlertDispatcher;
 import com.archloner.homeiotserver.service.SensorService;
-import com.archloner.homeiotserver.service.ThresholdService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/sensor")
 @RequiredArgsConstructor
 public class SensorController {
 
     private final SensorService sensorService;
+    private final AlertDispatcher alertDispatcher;
 
-    private final ThresholdService thresholdService;
-
-    private final DiscordAlertService discordAlertService;
-
-    @Value("${discord.alerts.threshold.enabled}")
-    private boolean discordAlertsEnabled;
-
-    @PostMapping("/sensor")
-    public ResponseEntity<SensorReading> saveReading(@RequestBody SensorReading request) {
+    @PostMapping
+    public ResponseEntity<SensorReading> saveReading(@Valid @RequestBody SensorReadingRequest request) {
         SensorReading reading = sensorService.saveReading(request);
 
-        if (discordAlertsEnabled) {
-            // check thresholds
-            if (thresholdService.isOutOfRange(reading.getDeviceId(), "temperature", reading.getTemperature())) {
-                discordAlertService.sendAlert("Temperature out of range: " + reading.getTemperature() + "°C");
-            }
-
-            if (thresholdService.isOutOfRange(reading.getDeviceId(), "humidity", reading.getHumidity())) {
-                discordAlertService.sendAlert("Humidity out of range: " + reading.getHumidity() + "%");
-            }
-
-            if (thresholdService.isOutOfRange(reading.getDeviceId(), "light", reading.getLight())) {
-                discordAlertService.sendAlert("Light out of range: " + reading.getLight() * 100 + "%");
-            }
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(reading);
+        alertDispatcher.maybeSendThresholdAlerts(reading);
+        return ResponseEntity.created(null).body(reading);
     }
 
-    @GetMapping("/sensor")
+    @GetMapping
     public ResponseEntity<List<SensorReading>> getAllReadings() {
         List<SensorReading> readings = sensorService.getAllReadings();
-        return ResponseEntity.status(HttpStatus.OK).body(readings);
+        return ResponseEntity.ok(readings);
     }
 
-    @GetMapping("/sensor/{deviceId}")
-    public ResponseEntity<List<SensorReading>> getReadingForDeviceId(@RequestParam String deviceId) {
+    @GetMapping("/{deviceId}")
+    public ResponseEntity<List<SensorReading>> getReadingForDeviceId(@PathVariable String deviceId) {
         List<SensorReading> deviceReadings = sensorService.getReadingsForDeviceId(deviceId);
-        return ResponseEntity.status(HttpStatus.OK).body(deviceReadings);
+        return ResponseEntity.ok(deviceReadings);
     }
 
 }

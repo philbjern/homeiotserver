@@ -1,5 +1,6 @@
 package com.archloner.homeiotserver.service;
 
+import com.archloner.homeiotserver.dto.SensorReadingRequest;
 import com.archloner.homeiotserver.entity.SensorReading;
 import com.archloner.homeiotserver.repository.SensorRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,21 @@ public class SensorService {
     private final SensorRepository sensorRepository;
     private final MqttClient mqttClient;
 
-    public SensorReading saveReading(SensorReading request) {
-        // Save to DB
-        SensorReading reading = sensorRepository.save(request);
+    public SensorReading saveReading(SensorReadingRequest request) {
+        SensorReading reading = new SensorReading();
+        reading.setDeviceId(request.deviceId());
+        reading.setTemperature(request.temperature());
+        reading.setHumidity(request.humidity());
+        reading.setLight(request.light());
+
+        reading = sensorRepository.save(reading);
         log.info("Received a sensor reading: {}", reading);
 
-        // Publish to MQTT
+        publishReadingsToMqtt(reading);
+        return reading;
+    }
+
+    private void publishReadingsToMqtt(SensorReading reading) {
         try {
             publish("homeiot/" + reading.getDeviceId() + "/temperature", String.valueOf(reading.getTemperature()));
             publish("homeiot/" + reading.getDeviceId() + "/humidity", String.valueOf(reading.getHumidity()));
@@ -31,7 +41,6 @@ public class SensorService {
         } catch (Exception e) {
             log.error("Error publishing readings to MQTT broker: {}", e.getMessage());
         }
-        return reading;
     }
 
     private void publish(String topic, String payload) throws Exception {

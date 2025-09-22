@@ -21,7 +21,7 @@ import java.util.Optional;
 public class ReportService {
 
     private final SensorRepository sensorRepository;
-    private final DiscordAlertService discordAlertService;
+    private final DiscordService discordService;
     private final ReportRepository reportRepository;
 
     @Value("${app.devices.main.id}")
@@ -109,7 +109,7 @@ public class ReportService {
         report.setEndTime(now);
         report.setMessage(message);
 
-        discordAlertService.sendAlert(message);
+        discordService.sendMessage(message);
 
         report.setSent(true);
         reportRepository.save(report);
