@@ -25,7 +25,7 @@ A self-hosted Spring Boot application for collecting and visualizing sensor data
 ###  1. Clone & Build
 
 ```bash
-git clone https://github.com/yourusername/homeiotserver.git
+git clone https://github.com/philbjern/homeiotserver.git
 cd homeiotserver
 mvn clean package -DskipTests
 ```
