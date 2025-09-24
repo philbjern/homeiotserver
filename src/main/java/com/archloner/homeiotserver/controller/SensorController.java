@@ -6,6 +6,10 @@ import com.archloner.homeiotserver.service.AlertDispatcher;
 import com.archloner.homeiotserver.service.SensorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +32,11 @@ public class SensorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SensorReading>> getAllReadings() {
-        List<SensorReading> readings = sensorService.getAllReadings();
-        return ResponseEntity.ok(readings);
+    public ResponseEntity<Page<SensorReading>> getAllReadings(
+            @PageableDefault(size = 20, sort = "timestampUtc", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<SensorReading> page = sensorService.getAllReadings(pageable);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{deviceId}")
