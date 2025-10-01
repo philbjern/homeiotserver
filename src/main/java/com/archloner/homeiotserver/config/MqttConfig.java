@@ -23,34 +23,6 @@ public class MqttConfig {
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
-
-        client.connect(options).waitForCompletion();
-        client.setCallback(new MqttCallback() {
-            @Override
-            public void connectionLost(Throwable throwable) {
-                log.warn("MQTT connection lost: {}", throwable.getMessage());
-            }
-
-            @Override
-            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {}
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
-        });
-
-        return client;
-    }
-
-    @Bean
-    public MqttClient mqttClient() throws Exception {
-        String broker = "tcp://localhost:1883";
-        String clientId = "homeiot-server";
-
-        MqttClient client = new MqttClient(broker, clientId, new MemoryPersistence());
-
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setCleanSession(true);
-        options.setAutomaticReconnect(true);
         options.setKeepAliveInterval(60);
 
         client.setCallback(new MqttCallback() {
@@ -60,13 +32,15 @@ public class MqttConfig {
             }
 
             @Override
-            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {}
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                log.info("Message arrived on {}: {}", topic, new String(mqttMessage.getPayload()));
+            }
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
         });
-        client.connect(options);
+
+        client.connect(options).waitForCompletion();
         return client;
     }
-
 }
